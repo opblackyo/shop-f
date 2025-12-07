@@ -10,14 +10,24 @@ const route = useRoute()
 const router = useRouter()
 const cartStore = useCartStore()
 
-// 判斷是否顯示導航列
+// 判斷是否顯示導航列（UGC 頁面也隱藏）
 const showNav = computed(() => {
-  const hideNavRoutes = ['Login', 'Register']
+  const hideNavRoutes = ['Login', 'Register', 'UGCFeed']
   return !hideNavRoutes.includes(route.name)
+})
+
+// 判斷是否顯示 UGC 入口按鈕
+const showUGCButton = computed(() => {
+  const hideUGCRoutes = ['Login', 'Register', 'UGCFeed']
+  return !hideUGCRoutes.includes(route.name)
 })
 
 function goToCart() {
   router.push('/cart')
+}
+
+function goToUGC() {
+  router.push('/ugc')
 }
 </script>
 
@@ -43,6 +53,16 @@ function goToCart() {
     <main :class="{ 'with-nav': showNav }">
       <router-view />
     </main>
+
+    <!-- UGC 短影音入口按鈕（右下角浮動按鈕） -->
+    <button
+      v-if="showUGCButton"
+      class="ugc-fab"
+      @click="goToUGC"
+      title="探索短影音"
+    >
+      🎬
+    </button>
   </div>
 </template>
 
@@ -139,6 +159,35 @@ main {
 
 main.with-nav {
   padding-top: 60px;
+}
+
+/* UGC 浮動按鈕 */
+.ugc-fab {
+  position: fixed;
+  bottom: 24px;
+  right: 24px;
+  width: 56px;
+  height: 56px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, #e74c3c, #c0392b);
+  border: none;
+  font-size: 28px;
+  cursor: pointer;
+  box-shadow: 0 4px 12px rgba(231, 76, 60, 0.4);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 99;
+  transition: transform 0.2s, box-shadow 0.2s;
+}
+
+.ugc-fab:hover {
+  transform: scale(1.1);
+  box-shadow: 0 6px 16px rgba(231, 76, 60, 0.5);
+}
+
+.ugc-fab:active {
+  transform: scale(0.95);
 }
 </style>
 

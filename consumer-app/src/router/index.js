@@ -9,6 +9,9 @@ import CartPage from '@/views/CartPage.vue'
 import CheckoutPage from '@/views/CheckoutPage.vue'
 import OrderStatusPage from '@/views/OrderStatusPage.vue'
 
+// 路由模組
+import ugcRoutes from './modules/ugc.js'
+
 const routes = [
   {
     path: '/',
@@ -49,7 +52,9 @@ const routes = [
     path: '/register',
     name: 'Register',
     component: () => import('@/views/RegisterPage.vue')
-  }
+  },
+  // UGC 短影音路由
+  ...ugcRoutes
 ]
 
 const router = createRouter({
