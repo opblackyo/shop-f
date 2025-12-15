@@ -42,13 +42,13 @@ async function loadVideos() {
 async function handleLike({ videoId, liked, callback }) {
   try {
     const result = await likeVideo(videoId)
-    // 更新影片列表中的資料
+    // 更新影片列表中的資料（API 回傳 likes_count）
     const video = videos.value.find(v => v.video_id === videoId)
     if (video) {
-      video.likes = result.total_likes
-      video.isLiked = result.liked
+      video.likes = result.likes_count
+      video.isLiked = liked
     }
-    callback(result)
+    callback({ liked, total_likes: result.likes_count })
   } catch (err) {
     console.error('按讚失敗:', err)
     // 回滾 UI

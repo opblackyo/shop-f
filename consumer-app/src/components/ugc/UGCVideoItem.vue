@@ -1,9 +1,10 @@
 <script setup>
 /**
  * UGC 單支影片元件
- * 包含影片播放、Overlay 資訊、按讚功能
+ * 包含影片播放、Overlay 資訊、按讚功能、評論面板
  */
 import { ref, watch, onMounted, onUnmounted } from 'vue'
+import CommentPanel from './CommentPanel.vue'
 
 const props = defineProps({
   video: {
@@ -21,7 +22,9 @@ const emit = defineEmits(['like'])
 const videoRef = ref(null)
 const isLiked = ref(props.video.isLiked || false)
 const likeCount = ref(props.video.likes)
+const commentCount = ref(props.video.comments)
 const showHeartAnimation = ref(false)
+const showComments = ref(false)
 
 // 監聽 isActive 狀態控制播放/暫停
 watch(() => props.isActive, (active) => {
@@ -74,6 +77,21 @@ function formatNumber(num) {
   return num.toString()
 }
 
+// 打開評論面板
+function openComments() {
+  showComments.value = true
+}
+
+// 關閉評論面板
+function closeComments() {
+  showComments.value = false
+}
+
+// 評論新增後更新計數
+function onCommentAdded() {
+  commentCount.value += 1
+}
+
 // 元件掛載時若為 active 則播放
 onMounted(() => {
   if (props.isActive && videoRef.value) {
@@ -117,9 +135,9 @@ onUnmounted(() => {
       </button>
       
       <!-- 評論按鈕 -->
-      <button class="action-btn">
+      <button class="action-btn" @click.stop="openComments">
         <span class="icon">💬</span>
-        <span class="count">{{ formatNumber(video.comments) }}</span>
+        <span class="count">{{ formatNumber(commentCount) }}</span>
       </button>
       
       <!-- 分享按鈕 -->
@@ -134,6 +152,14 @@ onUnmounted(() => {
       <div class="author">@{{ video.author }}</div>
       <div class="description">{{ video.description }}</div>
     </div>
+    
+    <!-- 評論面板 -->
+    <CommentPanel
+      :video-id="video.video_id"
+      :visible="showComments"
+      @close="closeComments"
+      @comment-added="onCommentAdded"
+    />
   </div>
 </template>
 

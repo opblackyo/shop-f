@@ -102,13 +102,113 @@ export async function likeVideo(videoId) {
     }
     
     return {
-      success: true,
-      liked: !wasLiked,
-      total_likes: video.likes
+      message: !wasLiked ? '已按讚' : '已取消按讚',
+      likes_count: video.likes
     }
   }
   
-  return http.post('/ugc/like', { video_id: videoId })
+  // API: POST /videos/{video_id}/like
+  return http.post(`/videos/${videoId}/like`)
+}
+
+/**
+ * 取得影片評論列表
+ * @param {number} videoId - 影片 ID
+ * @returns {Promise<{video_id: number, comments: Array}>}
+ */
+export async function getComments(videoId) {
+  if (USE_MOCK) {
+    await mockDelay()
+    
+    // Mock 評論資料
+    const mockComments = [
+      { comment_id: 1, user: 'Alice', content: '好讚的影片！', created_at: '2025-12-09T15:40:00' },
+      { comment_id: 2, user: 'Bob', content: '看起來超好吃', created_at: '2025-12-10T10:20:00' },
+      { comment_id: 3, user: 'Cindy', content: '下次也要去試試', created_at: '2025-12-11T08:15:00' }
+    ]
+    
+    return {
+      video_id: videoId,
+      comments: mockComments
+    }
+  }
+  
+  // API: GET /videos/{video_id}/comments
+  return http.get(`/videos/${videoId}/comments`)
+}
+
+/**
+ * 新增評論
+ * @param {number} videoId - 影片 ID
+ * @param {string} content - 評論內容
+ * @returns {Promise<{message: string, comment_id: number}>}
+ */
+export async function addComment(videoId, content) {
+  if (USE_MOCK) {
+    await mockDelay(300)
+    
+    if (!content || content.trim() === '') {
+      throw new Error('評論內容不可為空')
+    }
+    
+    return {
+      message: '評論新增成功',
+      comment_id: Math.floor(Math.random() * 1000) + 10
+    }
+  }
+  
+  // API: POST /videos/{video_id}/comments
+  return http.post(`/videos/${videoId}/comments`, { content })
+}
+
+/**
+ * 上傳影片
+ * @param {File} file - 影片檔案（僅支援 .mp4）
+ * @param {function} onProgress - 上傳進度回調
+ * @returns {Promise<{message: string, video_url: string}>}
+ */
+export async function uploadVideo(file, onProgress = null) {
+  if (USE_MOCK) {
+    // 驗證檔案類型
+    if (!file.name.endsWith('.mp4')) {
+      throw new Error('檔案格式錯誤，僅支援 mp4')
+    }
+    
+    // 驗證檔案大小（假設限制 100MB）
+    const maxSize = 100 * 1024 * 1024
+    if (file.size > maxSize) {
+      throw new Error('檔案大小超過限制')
+    }
+    
+    // 模擬上傳進度
+    if (onProgress) {
+      for (let i = 0; i <= 100; i += 10) {
+        await mockDelay(100)
+        onProgress(i)
+      }
+    } else {
+      await mockDelay(1000)
+    }
+    
+    return {
+      message: '影片上傳成功',
+      video_url: `http://127.0.0.1:2323/static/videos/mock_${Date.now()}.mp4`
+    }
+  }
+  
+  // API: POST /videos/upload (multipart/form-data)
+  const formData = new FormData()
+  formData.append('file', file)
+  
+  return http.post('/videos/upload', formData, {
+    headers: {
+      'Content-Type': 'multipart/form-data'
+    },
+    onUploadProgress: onProgress ? (e) => {
+      const percent = Math.round((e.loaded / e.total) * 100)
+      onProgress(percent)
+    } : undefined
+  })
 }
 
 /**
@@ -123,6 +223,9 @@ export function isVideoLiked(videoId) {
 export default {
   getFeed,
   likeVideo,
+  getComments,
+  addComment,
+  uploadVideo,
   isVideoLiked
 }
 

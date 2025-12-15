@@ -10,15 +10,15 @@ const route = useRoute()
 const router = useRouter()
 const cartStore = useCartStore()
 
-// 判斷是否顯示導航列（UGC 頁面也隱藏）
+// 判斷是否顯示導航列（UGC 頁面、首頁也隱藏）
 const showNav = computed(() => {
-  const hideNavRoutes = ['Login', 'Register', 'UGCFeed']
+  const hideNavRoutes = ['Login', 'Register', 'UGCFeed', 'Home']
   return !hideNavRoutes.includes(route.name)
 })
 
 // 判斷是否顯示 UGC 入口按鈕
 const showUGCButton = computed(() => {
-  const hideUGCRoutes = ['Login', 'Register', 'UGCFeed']
+  const hideUGCRoutes = ['Login', 'Register', 'UGCFeed', 'Home']
   return !hideUGCRoutes.includes(route.name)
 })
 

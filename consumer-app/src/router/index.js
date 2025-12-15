@@ -4,6 +4,7 @@
 import { createRouter, createWebHistory } from 'vue-router'
 
 // 頁面組件
+import HomePage from '@/views/HomePage.vue'
 import RestaurantPage from '@/views/RestaurantPage.vue'
 import CartPage from '@/views/CartPage.vue'
 import CheckoutPage from '@/views/CheckoutPage.vue'
@@ -15,7 +16,8 @@ import ugcRoutes from './modules/ugc.js'
 const routes = [
   {
     path: '/',
-    redirect: '/restaurant/1'
+    name: 'Home',
+    component: HomePage
   },
   {
     path: '/restaurant/:id',
